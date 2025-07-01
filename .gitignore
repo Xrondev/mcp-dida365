@@ -13,3 +13,4 @@ wheels/
 drafts/
 
 .env
+.token
