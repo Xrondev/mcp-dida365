@@ -48,18 +48,21 @@ class CallbackServer:
                     case "/" | "/auth":
                         # Redirect to the auth page
                         params = {
-                            "client_id": os.getenv("CLIENT_ID"),
-                            "scope": os.getenv("SCOPE", "tasks:read tasks:write"),
+                            "client_id": os.getenv("TICKTICK_CLIENT_ID"),
+                            "scope": os.getenv(
+                                "TICKTICK_SCOPE", "tasks:read tasks:write"
+                            ),
                             "state": svr.state,
                             "redirect_uri": f"http://{svr.host}:{svr.port}/callback",
                             "response_type": "code",
                         }
                         logging.info(
-                            f"Redirecting to {os.getenv('AUTH_URL')}?{urlencode(params)}"
+                            f"Redirecting to {os.getenv('TICKTICK_AUTH_URL')}?{urlencode(params)}"
                         )
                         self.send_response(302)
                         self.send_header(
-                            "Location", f"{os.getenv('AUTH_URL')}?{urlencode(params)}"
+                            "Location",
+                            f"{os.getenv('TICKTICK_AUTH_URL')}?{urlencode(params)}",
                         )
                         self.end_headers()
                     case "/callback":
@@ -79,20 +82,22 @@ class CallbackServer:
                         data = {
                             "code": code,
                             "grant_type": "authorization_code",
-                            "scope": os.getenv("SCOPE", "tasks:read tasks:write"),
+                            "scope": os.getenv(
+                                "TICKTICK_SCOPE", "tasks:read tasks:write"
+                            ),
                             "redirect_uri": f"http://{svr.host}:{svr.port}/callback",
                         }
 
                         headers = {
                             "Content-Type": "application/x-www-form-urlencoded",
-                            "Authorization": f"Basic {base64.b64encode(f'{os.getenv("CLIENT_ID")}:{os.getenv("CLIENT_SECRET")}'.encode('ascii')).decode('ascii')}",
+                            "Authorization": f"Basic {base64.b64encode(f'{os.getenv("TICKTICK_CLIENT_ID")}:{os.getenv("TICKTICK_CLIENT_SECRET")}'.encode('ascii')).decode('ascii')}",
                             "User-Agent": "MCP-dida365/1.0",  # Ticktick requires UA, or else return 400
                         }
-                        assert os.getenv("TOKEN_URL") is not None, (
+                        assert os.getenv("TICKTICK_TOKEN_URL") is not None, (
                             "TOKEN_URL is not set"
                         )
                         response = httpx.post(
-                            os.getenv("TOKEN_URL") or "",
+                            os.getenv("TICKTICK_TOKEN_URL") or "",
                             data=data,
                             headers=headers,
                         )
@@ -139,7 +144,7 @@ class CallbackServer:
 class Auth:
     def __init__(self):
         self.host = "localhost"
-        self.port = int(os.getenv("PORT") or 11365)
+        self.port = int(os.getenv("TICKTICK_PORT") or 11365)
 
     def run(self):
         token, expires_in = load_token()
@@ -149,7 +154,12 @@ class Auth:
                 host=self.host,
                 port=self.port,
             ) as svr:
-                if os.getenv("DOCKER_SERVER") not in ("1", "true", "True", "TRUE"):
+                if os.getenv("TICKTICK_DOCKER_SERVER") not in (
+                    "1",
+                    "true",
+                    "True",
+                    "TRUE",
+                ):
                     try:
                         webbrowser.open(f"http://{self.host}:{self.port}/auth")
                     except Exception as e:
