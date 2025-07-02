@@ -20,7 +20,7 @@ class APIClient:
         self.base_url = os.getenv("TICKTICK_API_BASE_URL", "https://api.dida365.com")
         self.api_version = os.getenv("TICKTICK_API_VERSION", "/open/v1")
 
-    def _perpare_fields(
+    def _prepare_fields(
         self, fields: dict[str, tuple[Any, Callable[[Any], Any] | None]]
     ):
         data: dict[str, Any] = {}
