@@ -1,5 +1,10 @@
+from utils.auth import Auth
+from server.mcp import mcp
+
+
 def main():
-    print("Hello from mcp-dida365!")
+    Auth().run()
+    mcp.run()
 
 
 if __name__ == "__main__":
