@@ -47,7 +47,7 @@ def get_projects() -> str:
     """
     try:
         projects = client.get_projects()
-        projects = filter(lambda x: not x.get("closed"), projects)
+        projects = list(filter(lambda x: not x.get("closed"), projects))
         formatted = []
         if projects:
             for k, v in enumerate(projects, 1):
