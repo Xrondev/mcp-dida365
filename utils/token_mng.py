@@ -34,3 +34,11 @@ def load_token() -> tuple[str | None, int]:
     except Exception:
         logging.error(f"Failed to load token from {TOKEN_FILE}")
         return None, 0
+
+
+def is_token_valid() -> bool:
+    """
+    Returns True if the token exists and is not expired, otherwise False.
+    """
+    token, expires_in = load_token()
+    return token is not None and expires_in > time.time()
