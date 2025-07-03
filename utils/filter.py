@@ -22,6 +22,8 @@ def _parse_iso_date(s: str) -> date:
 
 def _resolve_date_keyword(kw: str) -> date:
     today = datetime.now().date()
+    if kw.lower() == "yesterday":
+        return today - timedelta(days=1)
     if kw.lower() == "today":
         return today
     if kw.lower() == "tomorrow":
@@ -82,11 +84,6 @@ def filter_task(
 ) -> List[Dict[Any, Any]]:
     """
     Return only those tasks for which **all** filter expressions match.
-
-    filter_fields is a list of strings, e.g.
-      ["dueDate == tomorrow",
-       "startDate == today",
-       "priority >= high"]
     """
     preds = [_build_predicate(expr) for expr in filter_fields]
     return [task for task in tasks if all(pred(task) for pred in preds)]

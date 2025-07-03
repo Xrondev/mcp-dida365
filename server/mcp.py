@@ -112,9 +112,12 @@ def filter_project_tasks(project_id: str, filter_fields: List[str]) -> str:
     Filter the tasks in a project.
     Return only those tasks for which **all** filter expressions match.
 
-    filter_fields is a list of strings, e.g.
-      ["dueDate == tomorrow(or iso format date)",
-       "startDate == today(or iso format date)",
+    filter_fields is a list of strings, note "==" is used for absolutely equal, not recommended for date fields,
+    literal date indicator only has today, tomorrow, yesterday.
+    priority has high, medium, low, none.
+     e.g.
+      ["dueDate <= tomorrow(or iso format date)",
+       "startDate <= today(or iso format date)",
        "priority >= high(or low, medium, none)"]
 
     Args:
