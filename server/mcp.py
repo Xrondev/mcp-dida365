@@ -3,6 +3,7 @@ from typing import List, Dict, Any, Optional, Literal
 from server.client import APIClient
 import logging
 from utils.filter import filter_task
+from datetime import datetime
 
 mcp = FastMCP(
     "Dida365 MCP",
@@ -37,6 +38,8 @@ def format_task(task: Dict[Any, Any]) -> str:
             continue
         lines.append(f"{k}: {v}")
 
+    # 3) Add current time
+    lines.append(f"Current time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     return "\n".join(lines)
 
 
@@ -52,8 +55,8 @@ def generate_new_task_request(task_description: str) -> str:
     Generate a new user message for new task(s).
     """
     return f"""Use the MCP, create new task(s) with the following description: {task_description}. 
-You should split the task into subtasks(capstones) and fill the details for the task.
-The main task should have a appropriate start date and due date. Take other tasks in the week into consideration.
+You should split the task into subtasks(capstones) and fill the details for the task. If the subtask items are supposed to have due date, create it as a Task.
+The task should have a appropriate due date. Take other tasks in the week into consideration.
 """
 
 
