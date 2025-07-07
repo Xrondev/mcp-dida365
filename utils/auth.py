@@ -14,8 +14,6 @@ import time
 
 load_dotenv(find_dotenv())
 
-logging.basicConfig(level=logging.INFO)
-
 
 class CallbackServer:
     def __init__(
