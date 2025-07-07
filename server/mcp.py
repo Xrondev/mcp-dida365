@@ -4,7 +4,14 @@ from server.client import APIClient
 import logging
 from utils.filter import filter_task
 
-mcp = FastMCP("Dida365 MCP")
+mcp = FastMCP(
+    "Dida365 MCP",
+    instructions="""
+This server provides a todo list management service for user.
+If not specified, the task should always be created in the default project named "AI-Planner".
+Prompt the user to re-auth when response contains unauthorized error.
+""",
+)
 client = APIClient()
 
 
@@ -17,7 +24,9 @@ def format_task(task: Dict[Any, Any]) -> str:
         lines.append("Subtasks:")
         for idx, sub in enumerate(items, 1):
             fields = "; ".join(
-                f"{k}: {v}" for k, v in sub.items() if v not in (None, "", [], {})
+                f"{k}: {v}"
+                for k, v in sub.items()
+                if v not in (None, "", [], {}) and k not in ("timeZone")
             )
             lines.append(f"  {idx}. {fields}")
 
@@ -276,7 +285,7 @@ def create_task(
         repeatFlag (str): The repeat pattern of the task. Optional. Example: "RRULE:FREQ=DAILY;INTERVAL=1
         priority (int): The priority of the task. Optional. 0: none, 1:low, 3:medium, 5:high
         sortOrder (int): Smaller int will be at the top. Optional.
-        items (list): The items(subtasks/capstones) of the task. Optional. Example: [{
+        items (list): The items(subtasks/capstones) of the task. Optional, do NOT wrap the items as a string. Example: [{
                     "title": "Subtask 1",
                 },{
                     "title": "Subtask 2",
@@ -304,7 +313,7 @@ def create_task(
             return f"Error in create_task: {task}"
     except Exception as e:
         logging.error(f"Error in create_task: {e}")
-        return f"Error in create_task: {e}"
+        return f"Error in create_task: {e}, {items}"
 
 
 @mcp.tool()
@@ -361,7 +370,7 @@ def update_task(
             return f"Error in update_task: {task_id}, check id and project_id"
     except Exception as e:
         logging.error(f"Error in update_task: {e}")
-        return f"Error in update_task: {e}"
+        return f"Error in update_task: {e}, {items}"
 
 
 @mcp.tool()

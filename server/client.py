@@ -20,16 +20,6 @@ class APIClient:
         self.base_url = os.getenv("TICKTICK_API_BASE_URL", "https://api.dida365.com")
         self.api_version = os.getenv("TICKTICK_API_VERSION", "/open/v1")
 
-    def _perpare_fields(
-        self, fields: dict[str, tuple[Any, Callable[[Any], Any] | None]]
-    ):
-        data: dict[str, Any] = {}
-        for key, (val, fn) in fields.items():
-            if val is None:
-                continue
-            data[key] = fn(val) if fn is not None else val
-        return data
-
     def _make_request(self, method: str, url: str, **kwargs) -> ReturnType:
         """
         Make an authenticated request to the provider API.
@@ -54,6 +44,16 @@ class APIClient:
         except httpx.HTTPStatusError as e:
             logging.error(f"API Request Failed: {e}")
             return {"error": str(e)}
+
+    @staticmethod
+    def _build_data(**kwargs):
+        # Optionally accept a type_map for conversion
+        type_map = kwargs.pop("_type_map", {})
+        return {
+            k: (type_map[k](v) if k in type_map and v is not None else v)
+            for k, v in kwargs.items()
+            if v is not None
+        }
 
     # Project helper functions
     def get_projects(self) -> List[Any]:
@@ -97,14 +97,14 @@ class APIClient:
         """
         Create a project, return a dict
         """
-        fields = {
-            "name": (name, str),
-            "color": (color, None),
-            "sortOrder": (sortOrder, str),
-            "viewMode": (viewMode, None),
-            "kind": (kind, None),
-        }
-        data = self._perpare_fields(fields)
+        data = self._build_data(
+            name=name,
+            color=color,
+            sortOrder=sortOrder,
+            viewMode=viewMode,
+            kind=kind,
+            _type_map={"name": str, "sortOrder": str},
+        )
         logging.info(f"Creating project: {json.dumps(data)}")
         result = self._make_request("POST", "/project", data=data)
         if isinstance(result, dict):
@@ -124,14 +124,14 @@ class APIClient:
         """
         Update a project, return a dict
         """
-        fields = {
-            "name": (name, None),
-            "color": (color, None),
-            "sortOrder": (sortOrder, str),
-            "viewMode": (viewMode, None),
-            "kind": (kind, None),
-        }
-        data = self._perpare_fields(fields)
+        data = self._build_data(
+            name=name,
+            color=color,
+            sortOrder=sortOrder,
+            viewMode=viewMode,
+            kind=kind,
+            _type_map={"sortOrder": str},
+        )
         result = self._make_request("PUT", f"/project/{project_id}", data=data)
         if isinstance(result, dict):
             return result
@@ -170,21 +170,20 @@ class APIClient:
         Create a task in a project. Returns the created task dict.
         All parameters except project_id and title are optional and map to the API fields.
         """
-        fields = {
-            "projectId": (project_id, None),
-            "title": (title, None),
-            "content": (content, None),
-            "isAllDay": (isAllDay, lambda x: str(x).lower()),
-            "startDate": (startDate, None),
-            "dueDate": (dueDate, None),
-            "timeZone": (timeZone, None),
-            "reminders": (reminders, None),
-            "repeatFlag": (repeatFlag, None),
-            "priority": (priority, None),
-            "sortOrder": (sortOrder, None),
-            "items": (items, lambda x: json.dumps(x)),
-        }
-        data = self._perpare_fields(fields)
+        data = self._build_data(
+            projectId=project_id,
+            title=title,
+            content=content,
+            isAllDay=isAllDay,
+            startDate=startDate,
+            dueDate=dueDate,
+            timeZone=timeZone,
+            reminders=reminders,
+            repeatFlag=repeatFlag,
+            priority=priority,
+            sortOrder=sortOrder,
+            items=items,
+        )
         return self._make_request("POST", "/task", data=data)
 
     def update_task(
@@ -206,22 +205,21 @@ class APIClient:
         """
         Update a task, return a dict
         """
-        fields = {
-            "id": (task_id, None),
-            "projectId": (project_id, None),
-            "title": (title, None),
-            "content": (content, None),
-            "isAllDay": (isAllDay, lambda x: str(x).lower()),
-            "startDate": (startDate, None),
-            "dueDate": (dueDate, None),
-            "timeZone": (timeZone, None),
-            "reminders": (reminders, None),
-            "repeatFlag": (repeatFlag, None),
-            "priority": (priority, None),
-            "sortOrder": (sortOrder, None),
-            "items": (items, lambda x: json.dumps(x)),
-        }
-        data = self._perpare_fields(fields)
+        data = self._build_data(
+            id=task_id,
+            projectId=project_id,
+            title=title,
+            content=content,
+            isAllDay=isAllDay,
+            startDate=startDate,
+            dueDate=dueDate,
+            timeZone=timeZone,
+            reminders=reminders,
+            repeatFlag=repeatFlag,
+            priority=priority,
+            sortOrder=sortOrder,
+            items=items,
+        )
         return self._make_request("PUT", f"/task/{task_id}", data=data)
 
     def complete_task(self, project_id: str, task_id: str) -> ReturnType:
