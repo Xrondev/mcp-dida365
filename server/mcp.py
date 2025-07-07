@@ -27,7 +27,7 @@ def format_task(task: Dict[Any, Any]) -> str:
             fields = "; ".join(
                 f"{k}: {v}"
                 for k, v in sub.items()
-                if v not in (None, "", [], {}) and k not in ("timeZone")
+                if v not in (None, "", [], {}) and k != "timeZone"
             )
             lines.append(f"  {idx}. {fields}")
 
