@@ -4,6 +4,10 @@ from server.mcp import mcp
 import sys
 import traceback
 
+logging.basicConfig(
+    level=logging.INFO,
+)
+
 
 def main():
     try:
