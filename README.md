@@ -1,5 +1,5 @@
 # TickTick MCP Server
-
+README: [English](README.md) | [中文](README_CN.md)
 > **Credits**: This project builds upon ideas from [jacepark12/ticktick-mcp](https://github.com/jacepark12/ticktick-mcp)
 
 A Model Context Protocol (MCP) server for TickTick/Dida365 todo list integration. Created as a learning exercise for MCP while solving a real need - using AI to automatically decompose complex goals into actionable tasks.
@@ -75,7 +75,7 @@ The server automatically opens your browser for OAuth when first initiated or to
 
 1. **API Limitations**:
    - ~~Cannot access Inbox tasks~~ [WIP] - only project tasks
-   - Some features (advanced filters, complex repeats) unavailable
+   - Some features (advanced filters, complex repeats) unavailable (or WIP)
    - Completed tasks not visible in some endpoints
    - **Tokens expire after 180 days** (no refresh available, as the endpoint did not return refresh token)
 

@@ -3,7 +3,7 @@ from dotenv import load_dotenv
 import httpx
 from utils.token_mng import load_token, is_token_valid
 from utils.auth import Auth
-from typing import Dict, List, Any, Literal, Optional, Callable
+from typing import Dict, List, Any, Literal, Optional
 import logging
 import json
 
