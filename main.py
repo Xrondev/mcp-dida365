@@ -1,10 +1,18 @@
+import logging
 from utils.auth import Auth
 from server.mcp import mcp
+import sys
+import traceback
 
 
 def main():
-    Auth().run()
-    mcp.run()
+    try:
+        Auth().run()
+        mcp.run()
+    except Exception as e:
+        logging.error(f"Error: {e}")
+        traceback.print_exc(file=sys.stderr)
+        sys.exit(1)
 
 
 if __name__ == "__main__":
