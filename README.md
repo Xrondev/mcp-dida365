@@ -1,56 +1,56 @@
 # TickTick MCP Server
-README: [English](README.md) | [中文](README_CN.md)
-> **Credits**: This project builds upon ideas from [jacepark12/ticktick-mcp](https://github.com/jacepark12/ticktick-mcp)
+README: [English](README_EN.md) | [中文](README.md)
+> 这篇文档由Claude翻译，部分翻译可能存在错误。
 
-A Model Context Protocol (MCP) server for TickTick/Dida365 todo list integration. Created as a learning exercise for MCP while solving a real need - using AI to automatically decompose complex goals into actionable tasks.
+> **Credit**: 本项目部分功能/工具基于 [jacepark12/ticktick-mcp](https://github.com/jacepark12/ticktick-mcp) 的思路开发
 
-## 🚀 Improvements
+一个用于 TickTick/滴答清单 待办事项集成的模型上下文协议 (MCP) 服务器。作为学习 MCP 的练习项目创建，同时解决实际需求 - 使用 AI 自动将复杂目标分解为可执行的任务。
 
-1. **Automated auth flow** - Browser automatically opens for OAuth, no manual CLI operations needed
-2. **Expanded operations** - Added subtasks, task filters, and more attributes for projects/tasks
-3. **AI prompt template** - Experimental prompt included for Claude Desktop (access via + → MCP Server → Prompt/References)
+## 🚀 改进功能
+1. **自动化认证流程** - 浏览器自动打开进行 OAuth 认证，无需手动 CLI 操作
+2. **扩展操作功能** - 新增子任务、任务过滤器和更多项目/任务属性
+3. **AI 提示模板** - 为 Claude Desktop 包含实验性提示（通过 + 按键 → MCP Server → Prompt/References 访问）
 
-## 📋 Installation
+## 📋 安装配置
 
-### 1. Setup
+### 1. 环境搭建
 ```bash
 git clone https://github.com/Xrondev/mcp-dida365
 cd mcp-dida365
 uv sync
 ```
 
-### 2. OAuth Configuration
+### 2. OAuth 配置
+1. 在 [TickTick 开发者中心](https://developer.ticktick.com) 或 [滴答清单开发者中心（中国用户）](https://developer.dida365.com) 注册应用
+2. **设置重定向 URI**: `http://localhost:11365/callback`
+3. 记录您的 Client ID 和 Client Secret
 
-1. Register application at [TickTick Developer Center](https://developer.ticktick.com) or [Dida365 Developer Center (Chinese User)](https://developer.dida365.com)
-2. **Set redirect URI**: `http://localhost:11365/callback`
-3. Note your Client ID and Client Secret
-
-### 3. Environment Setup
+### 3. 环境变量设置
 ```bash
 cp .env.template .env
-vim .env  # Edit with your credentials
+vim .env  # 编辑您的凭据
 ```
 
-**For Dida365** (default):
+**滴答清单配置** (默认):
 ```env
 TICKTICK_AUTH_URL=https://dida365.com/oauth/authorize
 TICKTICK_TOKEN_URL=https://dida365.com/oauth/token
 TICKTICK_API_BASE_URL=https://api.dida365.com
-
 TICKTICK_CLIENT_ID=your_client_id
 TICKTICK_CLIENT_SECRET=your_client_secret
 TICKTICK_PORT=11365
 TICKTICK_SCOPE="tasks:read tasks:write"
 ```
 
-**For TickTick**: Replace URLs with `ticktick.com` domains
+**TickTick 配置**: 将 URL 替换为 `ticktick.com` 域名
 
-### 4. MCP Client Configuration
-In your MCP client(Claude Desktop, Cursor, Copilot, etc.), modify the mcp config file.
+### 4. MCP 客户端配置
+在您的 MCP 客户端（Claude Desktop, Cursor, Copilot 等）中，修改 mcp 配置文件。
+
 ```json
 {
   "mcpServers": {
-    // YOUR OTHER MCP SERVERS ...
+    // 您的其他 MCP 服务器 ...
     "ticktick-mcp": {
       "command": "/absolute/path/to/uv",
       "args": ["run", "--with", "mcp", "/absolute/path/to/main.py"]
@@ -59,48 +59,44 @@ In your MCP client(Claude Desktop, Cursor, Copilot, etc.), modify the mcp config
 }
 ```
 
-**Finding paths**:
+**查找路径**:
 ```bash
-# Activate venv first
+# 首先激活虚拟环境
 source .venv/bin/activate
-which uv  # Get uv path
-pwd       # Get current directory, append /main.py
+which uv  # 获取 uv 路径
+pwd       # 获取当前目录，追加 /main.py
 ```
 
-## 🔐 Authentication
+## 🔐 身份认证
+服务器在首次启动或令牌无效时会自动打开浏览器进行 OAuth 认证。令牌保存到 `.token` 文件，有效期为 **180 天**。
 
-The server automatically opens your browser for OAuth when first initiated or token no longer valid. Token is saved to `.token` file and valid for **180 days**.
+## ⚠️ 使用限制
+1. **API 限制**:
+   - ~~无法访问收集箱任务~~ [开发中] - 仅支持项目任务
+   - 某些功能（高级过滤器、任务重复）不可用（或开发中）
+   - 已完成任务在某些端点中不可见
+   - **令牌 180 天后过期**（无刷新功能，因为端点未返回刷新令牌）
 
-## ⚠️ Limitations
+2. **实现说明**:
+   - 由于 API 文档不明确，repeatFlag 和提醒等任务属性可能未实现或行为异常
 
-1. **API Limitations**:
-   - ~~Cannot access Inbox tasks~~ [WIP] - only project tasks
-   - Some features (advanced filters, complex repeats) unavailable (or WIP)
-   - Completed tasks not visible in some endpoints
-   - **Tokens expire after 180 days** (no refresh available, as the endpoint did not return refresh token)
+## 故障排除
 
-2. **Implementation Notes**:
-   - Task attributes like repeatFlag and reminders may not available or behave unexpectedly due to unclear API docs
-## Troubleshooting
-**Browser doesn't open for auth:**
+**浏览器无法打开进行认证:**
+- 检查端口 11365 是否可用，如需要可更改端口（记得同时在开发者中心更改回调 URL）
+- 如需要可手动访问认证 URL（查看日志）
 
-- Check if port 11365 is available, you can change port if needed (remember also change the CALLBACK URL in developer center)
-- Manually visit the auth URL if needed (check logs)
+**"Token invalid" 错误:**
+- 尝试删除 .token 文件并重新认证
 
-**"Token invalid" errors:**
+**MCP 客户端问题:**
+- 在配置中使用绝对路径
+- 检查 main.py 是否有执行权限
 
-- Try delete .token file and re-authenticate
+其他问题：请提交 issue 并附上错误详情（mcp.log 或任何与服务器相关的日志）
 
-**MCP client issues:**
+## ⭐ 支持项目
+如果这个项目对您有帮助，请给个 Star！
 
-- Use absolute paths in configuration
-- Check main.py has execute permissions
-
-Other issues: Please open an issue with error details (mcp.log or any log you have that is related to the server)
-
-## ⭐ Support
-Star if this project helps! 
-
-## 📄 License
-
-MIT License - see LICENSE file for details.
+## 📄 许可证
+MIT 许可证 - 详见 LICENSE 文件
