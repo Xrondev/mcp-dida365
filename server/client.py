@@ -6,6 +6,7 @@ from utils.auth import Auth
 from typing import Dict, List, Any, Literal, Optional
 import logging
 import json
+from utils.inbox_mng import get_inbox_project_id
 
 load_dotenv()
 
@@ -61,8 +62,9 @@ class APIClient:
         Get all projects, return a list of projects
         """
         result = self._make_request("GET", "/project")
+        inbox_project_id = get_inbox_project_id(self)
         if isinstance(result, list):
-            return result
+            return [{"id": inbox_project_id, "name": "Inbox"}] + result
         else:
             return []
 
