@@ -63,7 +63,7 @@ The task should have a appropriate due date. Take other tasks in the week into c
 @mcp.tool()
 def get_projects() -> str:
     """
-    Get a list of all Projects(collections of tasks).
+    Get a list of all Projects(collections of tasks). The inbox contains all tasks that are not allocated to any project.
 
     Returns:
         str: Formatted list of projects
