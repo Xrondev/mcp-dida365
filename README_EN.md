@@ -8,7 +8,8 @@ A Model Context Protocol (MCP) server for TickTick/Dida365 todo list integration
 
 1. **Automated auth flow** - Browser automatically opens for OAuth, no manual CLI operations needed
 2. **Expanded operations** - Added subtasks, task filters, and more attributes for projects/tasks
-3. **AI prompt template** - Experimental prompt included for Claude Desktop (access via + → MCP Server → Prompt/References)
+3. **Inbox tasks management** - Implemented a workround to manage the tasks inside the Inbox!
+4. **AI prompt template** - Experimental prompt included for Claude Desktop (access via + → MCP Server → Prompt/References)
 
 ## 📋 Installation
 
@@ -74,7 +75,7 @@ The server automatically opens your browser for OAuth when first initiated or to
 ## ⚠️ Limitations
 
 1. **API Limitations**:
-   - ~~Cannot access Inbox tasks~~ [WIP] - only project tasks
+   - ~~Cannot access Inbox tasks, only project tasks~~ Solved
    - Some features (advanced filters, complex repeats) unavailable (or WIP)
    - Completed tasks not visible in some endpoints
    - **Tokens expire after 180 days** (no refresh available, as the endpoint did not return refresh token)
